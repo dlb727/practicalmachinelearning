@@ -190,7 +190,7 @@ cornum &lt;- length(setdiff(nfnames, trngreduxnames))
 setdiff(nfnames, trngreduxnames) -&gt; cornumvar
 ncol(trngredux) -&gt; trngreduxvar
 rm(newtrng, nf, nzvtrng, training, newtrngb) ##remove temporary tables from environment </code></pre>
-<p>The factor variables were left out to run the functions for correlation and linear dependencies. The 10 highly correlated variables removed are <code>cornumvar</code>. No linear dependencies were found. The final number of variables after preprocessing is 45.</p>
+<p>The factor variables were left out to run the functions for correlation and linear dependencies. The 13 highly correlated variables removed are <code>cornumvar</code>. No linear dependencies were found. The final number of variables after preprocessing is 42.</p>
 </div>
 </div>
 <div id="cross-validation" class="section level2">
@@ -225,16 +225,16 @@ registerDoSEQ()</code></pre>
 <p>The following confusion matrix table compares the predicted values against the actual values of the test subsample of the training data set.</p>
 <pre><code>##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1051   82   41   47   26
-##          B   54  661   52    4   91
-##          C  123  132  707  161   51
-##          D  148   47   52  561   32
-##          E   19   27    3   31  701</code></pre>
+##          A 1195  173  140  122   52
+##          B   49  612   62    3   96
+##          C   56   90  617  115   45
+##          D   89   59   32  506   28
+##          E    6   15    4   58  680</code></pre>
 <pre><code>##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##   7.506117e-01   6.861346e-01   7.382535e-01   7.626710e-01   2.844617e-01 
+##   7.361338e-01   6.637476e-01   7.235585e-01   7.484274e-01   2.844617e-01 
 ## AccuracyPValue  McnemarPValue 
-##   0.000000e+00   1.845174e-59</code></pre>
-<p>The accuracy came out to be 0.7506117.</p>
+##   0.000000e+00   7.612867e-70</code></pre>
+<p>The accuracy came out to be 0.7361338.</p>
 </div>
 <div id="predict-test-data-test-data-20-cases" class="section level2">
 <h2>Predict Test Data (Test Data: 20 Cases)</h2>
@@ -250,7 +250,7 @@ TESTpred &lt;- predict(ModFit1, TESTredux)</code></pre>
 </div>
 <div id="test-data-prediction-results-test-data-20-cases" class="section level2">
 <h2>Test Data Prediction Results (Test Data: 20 Cases)</h2>
-<p>The following classes are predicted for the 20 test cases: C, C, A, A, C, E, D, C, A, A, A, A, B, A, E, E, A, B, B, B.</p>
+<p>The following classes are predicted for the 20 test cases: C, A, A, A, A, C, D, E, A, A, A, A, B, A, E, A, A, B, A, B.</p>
 <p>Since there is no “classe” variable attached to the actual test data, there is no way to compute the accuracy of these test case predictions. It can only be assumed to be lower than the accuracy for the testing portion of the training data, but it will hopefully be close.</p>
 </div>
 

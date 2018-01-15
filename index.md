@@ -3,19 +3,11 @@ title: "Practical Machine Learning Course Project"
 author: "Dorothy Buckley"
 date: "January 14, 2018"
 output: 
-  html_document 
+  html_document: 
+    keep_md: yes
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(error = TRUE)
-require(caret)
-require(klaR)
-require(dplyr)
-require(parallel)
-require(doParallel)
-cluster <- makeCluster(detectCores() - 1) # convention to leave 1 core for OS
-registerDoParallel(cluster)
-```
+
 
 ## Executive Summary
 For this course project, I used the training and testing data sets extracted from the Weight Lifting Excercise Dataset.  The goal was to fit a model which would predict the manner in which 6 subjects did their exercises based on measurements taken from 4 accelerometers: belt, forearm, arm and dumbbell.  The *manner* is the "classe" variable from the training set: 1 of 5 possible classes.  I then used this model to predict 20 test cases.
@@ -23,32 +15,12 @@ For this course project, I used the training and testing data sets extracted fro
 Source information on this experiment can be found here: [link] (http://groupware.les.inf.puc-rio.br/har)
 
 ## Get Data
-```{r, echo=FALSE, cache=TRUE}
-###Get files
-## url1 <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
-## url2 <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
-## download.file(url1, destfile = "./pmltrng.csv")
-## download.file(url2, destfile = "./pmltstg.csv")
-training <- read.csv("C:/Users/Dorothy/Documents/Classes/Data Science Track/Practical Machine Learning/pmltrnG.csv", stringsAsFactors = FALSE)
-testing <- read.csv("C:/Users/Dorothy/Documents/Classes/Data Science Track/Practical Machine Learning/pmltstg.csv", stringsAsFactors = FALSE)
-###determine variable classes
-trngnames <- names(training)
-tstgnames <- names(testing)
-trngclass <- sapply(training, class)
-tstngclass <- sapply(testing, class)
-tn <- cbind(trngnames, trngclass) ## see class of training data for each variable
-tt <- cbind(tstgnames, tstngclass) ## see class of testing data for each variable
-length(trngnames) -> trngvar
-nrow(training) -> trngobs
-length(tstgnames) -> tstgvar
-nrow(testing) -> tstgobs
-setdiff(tstgnames, trngnames) -> tstgonly
-setdiff(trngnames, tstgnames) -> trngonly
-```
-The training set has `r trngvar` variables and `r trngobs` observations; the testing set has `r tstgvar` variables and `r tstgobs` observations.  Although they have the same number of variables, they are not exactly the same.  The training set has the variable called `r trngonly` and the testing set has the variable called `r tstgonly`; each do not appear in the other sets.  Since we are trying to predict the `r trngonly` variable for the testing set, I split the training data for testing prior to predicting on the original 20 test cases. 
+
+The training set has 160 variables and 19622 observations; the testing set has 160 variables and 20 observations.  Although they have the same number of variables, they are not exactly the same.  The training set has the variable called classe and the testing set has the variable called problem_id; each do not appear in the other sets.  Since we are trying to predict the classe variable for the testing set, I split the training data for testing prior to predicting on the original 20 test cases. 
 
 ## Clean Data
-```{r, echo=TRUE, cache=TRUE}
+
+```r
 del <- complete.cases(training)
 ###length(which(del[del==TRUE])) ## number of complete cases
 
@@ -64,29 +36,32 @@ colnumB <- ncol(newtrngb)
 
 length(which(del[del==TRUE])) -> trngcc
 ```
-Visual inspection of the csv file shows a large amount of NAs, and they are consistently dispersed through certain columns for the same records; in fact there are only `r trngcc` complete cases out of the `r trngobs` records.  There are too many NAs for imuptation so the NA's were removed which reduced to `r colnumA` variables.  *Note: Although I chose to use the Naive Bayes method which is supposed to handle NAs by omission or bypassing, the sheer number of NAs compelled me to use data cleaning prior to preprocessing.*There are 3 timestamp variables, however, there is no timespan of or cycle of repeated activity.  The 6 subjects seem to have performed these experiments one time.  So these three time variables, and an extraneous index variable "X", were also removed which reduced to `r colnumB` variables. 
+Visual inspection of the csv file shows a large amount of NAs, and they are consistently dispersed through certain columns for the same records; in fact there are only 406 complete cases out of the 19622 records.  There are too many NAs for imuptation so the NA's were removed which reduced to 93 variables.  *Note: Although I chose to use the Naive Bayes method which is supposed to handle NAs by omission or bypassing, the sheer number of NAs compelled me to use data cleaning prior to preprocessing.*There are 3 timestamp variables, however, there is no timespan of or cycle of repeated activity.  The 6 subjects seem to have performed these experiments one time.  So these three time variables, and an extraneous index variable "X", were also removed which reduced to 89 variables. 
 
 ## Split Dataset
-```{r, echo=TRUE, cache=TRUE}
+
+```r
 inTrain <- createDataPartition(y=newtrngb$classe, p=.75, list=FALSE)
 trng <- newtrngb[inTrain,] ## 14718 records
 tstg <- newtrngb[-inTrain,] ## 4904 records
 nrow(trng) -> tnobs
 nrow(tstg) -> ttobs
 ```
-The training dataset was split into subsets to incorporate accuracy testing, prior to predicting on the actual test set which does not have the outcome variable "classe".  There are `r tnobs` records for training and `r ttobs` records for testing the model.
+The training dataset was split into subsets to incorporate accuracy testing, prior to predicting on the actual test set which does not have the outcome variable "classe".  There are 14718 records for training and 4904 records for testing the model.
 
 ## Preprocess Training Data
 ### Remove Zero and Near-Zero Variance Predictors
-```{r, echo=TRUE, cache=TRUE}
+
+```r
 nzv <- nearZeroVar(trng)
 nzvtrng <- trng[,-nzv] ## delete 0 and near-0 variance predictors from training table
 dim(nzvtrng)[2] -> nzvvar
 ```
-Next, the data was checked for predictors that only have a single unique value or only a handful of unique values occurring with very low frequencies to filter out of the modeling process. These zero-variance predictors may have an undue influence on the model and need to be discarded prior to modeling.  Preprocessing for these zero/near-zero variance predictors reduced the table size to `r nzvvar` variables.  *Note: There are only 2 factor variables: user_name and classe.*
+Next, the data was checked for predictors that only have a single unique value or only a handful of unique values occurring with very low frequencies to filter out of the modeling process. These zero-variance predictors may have an undue influence on the model and need to be discarded prior to modeling.  Preprocessing for these zero/near-zero variance predictors reduced the table size to 55 variables.  *Note: There are only 2 factor variables: user_name and classe.*
 
 ### Remove Highly Correlated and Linear Dependencies
-```{r, echo=TRUE, cache=TRUE}
+
+```r
 ### table with no factors (took out user_name and classe)
 nf <- nzvtrng[, 2:54]
 ### remove linear dependencies
@@ -105,17 +80,19 @@ setdiff(nfnames, trngreduxnames) -> cornumvar
 ncol(trngredux) -> trngreduxvar
 rm(newtrng, nf, nzvtrng, training, newtrngb) ##remove temporary tables from environment 
 ```
-The factor variables were left out to run the functions for correlation and linear dependencies.  The `r cornum`  highly correlated variables removed are `cornumvar`.  No linear dependencies were found.  The final number of variables after preprocessing is `r trngreduxvar`.
+The factor variables were left out to run the functions for correlation and linear dependencies.  The 10  highly correlated variables removed are `cornumvar`.  No linear dependencies were found.  The final number of variables after preprocessing is 45.
 
 ## Cross Validation
-```{r, echo=TRUE, cache=TRUE}
+
+```r
 set.seed(7272)
 tc <- trainControl(method = "repeatedcv", number = 5, repeats = 5, preProcOptions = c("center", "scale"), allowParallel = TRUE)
-``` 
+```
 The traincontrol option was used to specify the resampling method with repeated 5-fold cross-validation and for centering and scaling the data.
 
 ## Fit Model
-```{r, echo=TRUE, cache=TRUE}
+
+```r
 set.seed(3535)
 ModFit1 <- train(classe ~ ., data = trngredux, method = "nb", trControl = tc)
 stopCluster(cluster)
@@ -124,7 +101,8 @@ registerDoSEQ()
 The train model chosen was Naive Bayes *(klaR package)* which is one of many models used for classification modeling. Although it may be less accurate than some other models, it is still considered a good baseline model.  The *naive* aspect is due to the underlying assumption of independence between predictors.  Highly correlated variables were already removed during pre-processing so this assumption was continued.
 
 ## Apply Equivalent Pre-processing to Test Data (Subsample of Training Data)
-```{r, echo=TRUE, cache=TRUE}
+
+```r
 tstgredux <- tstg[, trngreduxnames]
 tstgreduxnames <- names(tstgredux)
 ##setdiff(trngreduxnames, tstgreduxnames) ran to ensure same variables in test and training sets
@@ -132,7 +110,8 @@ tstgreduxnames <- names(tstgredux)
 Running the functions for correlation and zero/near-zero variance may yield different variables on a test set.  Preprocessing the test set involved removing the same variables removed from the training set.
 
 ## Predict Test Data (Subsample of Training Data)
-```{r, echo=TRUE, cache=TRUE, warning=FALSE}
+
+```r
 set.seed(5252)
 cluster2 <- makeCluster(detectCores() - 1) # convention to leave 1 core for OS
 registerDoParallel(cluster2)
@@ -142,15 +121,28 @@ registerDoSEQ()
 ```
 
 The following confusion matrix table compares the predicted values against the actual values of the test subsample of the training data set.
-```{r, echo=FALSE, cache=TRUE}
-confusionMatrix(tstgpred, tstgredux$classe)$table
-confusionMatrix(tstgpred, tstgredux$classe)$overall
-acc <- confusionMatrix(tstgpred, tstgredux$classe)$overall[[1]]
+
 ```
-The accuracy came out to be `r acc`. 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 1051   82   41   47   26
+##          B   54  661   52    4   91
+##          C  123  132  707  161   51
+##          D  148   47   52  561   32
+##          E   19   27    3   31  701
+```
+
+```
+##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
+##   7.506117e-01   6.861346e-01   7.382535e-01   7.626710e-01   2.844617e-01 
+## AccuracyPValue  McnemarPValue 
+##   0.000000e+00   1.845174e-59
+```
+The accuracy came out to be 0.7506117. 
 
 ## Predict Test Data (Test Data: 20 Cases)
-```{r, echo=TRUE, cache=TRUE, warning=FALSE}
+
+```r
 ## Apply Equivalent Pre-processing to Test Data
 TESTreduxnames <- trngreduxnames[1:ncol(trngredux)-1]
 TESTreduxnamesInd <- names(testing) %in% TESTreduxnames
@@ -163,6 +155,6 @@ TESTpred <- predict(ModFit1, TESTredux)
 ```
  
 ## Test Data Prediction Results (Test Data: 20 Cases)
-The following classes are predicted for the 20 test cases: `r TESTpred`.  
+The following classes are predicted for the 20 test cases: C, C, A, A, C, E, D, C, A, A, A, A, B, A, E, E, A, B, B, B.  
 
 Since there is no "classe" variable attached to the actual test data, there is no way to compute the accuracy of these test case predictions.  It can only be assumed to be lower than the accuracy for the testing portion of the training data, but it will hopefully be close.
