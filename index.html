@@ -151,7 +151,7 @@ newtrngb &lt;- newtrng[,c(2, 6:93)]
 colnumB &lt;- ncol(newtrngb) 
 
 length(which(del[del==TRUE])) -&gt; trngcc</code></pre>
-<p>Visual inspection of the csv file shows a large amount of NAs, and they are consistently dispersed through certain columns for the same records; in fact there are only 406 complete cases out of the 19622 records. There are too many NAs for imuptation so the NA’s were removed which reduced to 93 variables. <em>Note: Although I chose to use the Naive Bayes method which is supposed to handle NAs by omission or bypassing, the sheer number of NAs compelled me to use data cleaning prior to preprocessing.</em>There are 3 timestamp variables, however, there is no timespan of or cycle of repeated activity. The 6 subjects seem to have performed these experiments one time. So these three time variables, and an extraneous index variable “X”, were also removed which reduced to 89 variables.</p>
+<p>Visual inspection of the csv file shows a large amount of NAs, and they are consistently dispersed through certain columns for the same records; in fact there are only 406 complete cases out of the 19622 records. There are too many NAs for imputation so the NA’s were removed which reduced to 93 variables. <em>Note: Although I chose to use the Naive Bayes method which is supposed to handle NAs by omission or bypassing, the sheer number of NAs compelled me to use data cleaning prior to preprocessing.</em>There are 3 timestamp variables, however, there is no timespan of or cycle of repeated activity. The 6 subjects seem to have performed these experiments one time. So these three time variables, and an extraneous index variable “X”, were also removed which reduced to 89 variables.</p>
 </div>
 <div id="split-dataset" class="section level2">
 <h2>Split Dataset</h2>
@@ -190,7 +190,7 @@ cornum &lt;- length(setdiff(nfnames, trngreduxnames))
 setdiff(nfnames, trngreduxnames) -&gt; cornumvar
 ncol(trngredux) -&gt; trngreduxvar
 rm(newtrng, nf, nzvtrng, training, newtrngb) ##remove temporary tables from environment </code></pre>
-<p>The factor variables were left out to run the functions for correlation and linear dependencies. The 13 highly correlated variables removed are <code>cornumvar</code>. No linear dependencies were found. The final number of variables after preprocessing is 42.</p>
+<p>The factor variables were left out to run the functions for correlation and linear dependencies. The 13 highly correlated variables removed are num_window, roll_belt, gyros_belt_z, accel_belt_x, accel_belt_y, total_accel_arm, gyros_arm_z, magnet_arm_x, total_accel_dumbbell, gyros_dumbbell_y, gyros_dumbbell_z, accel_dumbbell_y, gyros_forearm_x. No linear dependencies were found. The final number of variables after preprocessing is 42.</p>
 </div>
 </div>
 <div id="cross-validation" class="section level2">

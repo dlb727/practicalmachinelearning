@@ -64,7 +64,7 @@ colnumB <- ncol(newtrngb)
 
 length(which(del[del==TRUE])) -> trngcc
 ```
-Visual inspection of the csv file shows a large amount of NAs, and they are consistently dispersed through certain columns for the same records; in fact there are only `r trngcc` complete cases out of the `r trngobs` records.  There are too many NAs for imuptation so the NA's were removed which reduced to `r colnumA` variables.  *Note: Although I chose to use the Naive Bayes method which is supposed to handle NAs by omission or bypassing, the sheer number of NAs compelled me to use data cleaning prior to preprocessing.*There are 3 timestamp variables, however, there is no timespan of or cycle of repeated activity.  The 6 subjects seem to have performed these experiments one time.  So these three time variables, and an extraneous index variable "X", were also removed which reduced to `r colnumB` variables. 
+Visual inspection of the csv file shows a large amount of NAs, and they are consistently dispersed through certain columns for the same records; in fact there are only `r trngcc` complete cases out of the `r trngobs` records.  There are too many NAs for imputation so the NA's were removed which reduced to `r colnumA` variables.  *Note: Although I chose to use the Naive Bayes method which is supposed to handle NAs by omission or bypassing, the sheer number of NAs compelled me to use data cleaning prior to preprocessing.*There are 3 timestamp variables, however, there is no timespan of or cycle of repeated activity.  The 6 subjects seem to have performed these experiments one time.  So these three time variables, and an extraneous index variable "X", were also removed which reduced to `r colnumB` variables. 
 
 ## Split Dataset
 ```{r, echo=TRUE, cache=TRUE}
@@ -105,7 +105,7 @@ setdiff(nfnames, trngreduxnames) -> cornumvar
 ncol(trngredux) -> trngreduxvar
 rm(newtrng, nf, nzvtrng, training, newtrngb) ##remove temporary tables from environment 
 ```
-The factor variables were left out to run the functions for correlation and linear dependencies.  The `r cornum`  highly correlated variables removed are `cornumvar`.  No linear dependencies were found.  The final number of variables after preprocessing is `r trngreduxvar`.
+The factor variables were left out to run the functions for correlation and linear dependencies.  The `r cornum`  highly correlated variables removed are `r cornumvar`.  No linear dependencies were found.  The final number of variables after preprocessing is `r trngreduxvar`.
 
 ## Cross Validation
 ```{r, echo=TRUE, cache=TRUE}
