@@ -3,7 +3,7 @@ title: "Practical Machine Learning Course Project"
 author: "Dorothy Buckley"
 date: "January 14, 2018"
 output: 
-  html_document: 
+ html_document: 
     keep_md: yes
 ---
 
@@ -36,7 +36,7 @@ colnumB <- ncol(newtrngb)
 
 length(which(del[del==TRUE])) -> trngcc
 ```
-Visual inspection of the csv file shows a large amount of NAs, and they are consistently dispersed through certain columns for the same records; in fact there are only 406 complete cases out of the 19622 records.  There are too many NAs for imuptation so the NA's were removed which reduced to 93 variables.  *Note: Although I chose to use the Naive Bayes method which is supposed to handle NAs by omission or bypassing, the sheer number of NAs compelled me to use data cleaning prior to preprocessing.*There are 3 timestamp variables, however, there is no timespan of or cycle of repeated activity.  The 6 subjects seem to have performed these experiments one time.  So these three time variables, and an extraneous index variable "X", were also removed which reduced to 89 variables. 
+Visual inspection of the csv file shows a large amount of NAs, and they are consistently dispersed through certain columns for the same records; in fact there are only 406 complete cases out of the 19622 records.  There are too many NAs for imputation so the NA's were removed which reduced to 93 variables.  *Note: Although I chose to use the Naive Bayes method which is supposed to handle NAs by omission or bypassing, the sheer number of NAs compelled me to use data cleaning prior to preprocessing.*There are 3 timestamp variables, however, there is no timespan of or cycle of repeated activity.  The 6 subjects seem to have performed these experiments one time.  So these three time variables, and an extraneous index variable "X", were also removed which reduced to 89 variables. 
 
 ## Split Dataset
 
@@ -80,7 +80,7 @@ setdiff(nfnames, trngreduxnames) -> cornumvar
 ncol(trngredux) -> trngreduxvar
 rm(newtrng, nf, nzvtrng, training, newtrngb) ##remove temporary tables from environment 
 ```
-The factor variables were left out to run the functions for correlation and linear dependencies.  The 10  highly correlated variables removed are `cornumvar`.  No linear dependencies were found.  The final number of variables after preprocessing is 45.
+The factor variables were left out to run the functions for correlation and linear dependencies.  The 13  highly correlated variables removed are num_window, roll_belt, gyros_belt_z, accel_belt_x, accel_belt_y, total_accel_arm, gyros_arm_z, magnet_arm_x, total_accel_dumbbell, gyros_dumbbell_y, gyros_dumbbell_z, accel_dumbbell_y, gyros_forearm_x.  No linear dependencies were found.  The final number of variables after preprocessing is 42.
 
 ## Cross Validation
 
@@ -125,20 +125,20 @@ The following confusion matrix table compares the predicted values against the a
 ```
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1051   82   41   47   26
-##          B   54  661   52    4   91
-##          C  123  132  707  161   51
-##          D  148   47   52  561   32
-##          E   19   27    3   31  701
+##          A 1203  164  146  117   52
+##          B   49  633   57    6   79
+##          C   38   81  616  108   39
+##          D   86   53   25  514   26
+##          E   19   18   11   59  705
 ```
 
 ```
 ##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##   7.506117e-01   6.861346e-01   7.382535e-01   7.626710e-01   2.844617e-01 
+##   7.485726e-01   6.795487e-01   7.361827e-01   7.606659e-01   2.844617e-01 
 ## AccuracyPValue  McnemarPValue 
-##   0.000000e+00   1.845174e-59
+##   0.000000e+00   9.155801e-60
 ```
-The accuracy came out to be 0.7506117. 
+The accuracy came out to be 0.7485726. 
 
 ## Predict Test Data (Test Data: 20 Cases)
 
@@ -155,6 +155,6 @@ TESTpred <- predict(ModFit1, TESTredux)
 ```
  
 ## Test Data Prediction Results (Test Data: 20 Cases)
-The following classes are predicted for the 20 test cases: C, C, A, A, C, E, D, C, A, A, A, A, B, A, E, E, A, B, B, B.  
+The following classes are predicted for the 20 test cases: A, A, A, A, A, C, D, E, A, A, A, A, B, A, E, E, A, B, A, B.  
 
 Since there is no "classe" variable attached to the actual test data, there is no way to compute the accuracy of these test case predictions.  It can only be assumed to be lower than the accuracy for the testing portion of the training data, but it will hopefully be close.

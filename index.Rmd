@@ -3,7 +3,8 @@ title: "Practical Machine Learning Course Project"
 author: "Dorothy Buckley"
 date: "January 14, 2018"
 output: 
-  html_document 
+ html_document: 
+    keep_md: yes
 ---
 
 ```{r setup, include=FALSE}
